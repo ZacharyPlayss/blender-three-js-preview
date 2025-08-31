@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="nl-be">
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js Blender preview</title>
+    <link rel="stylesheet" href="./styles/style.css">
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/",
+            "lil-gui": "https://cdn.jsdelivr.net/npm/lil-gui@0.18.0/+esm",
+            "lil-gui-helper":"./scripts/lil-gui-helper.js"
+          }
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const source = new EventSource('/reload');
+          source.onmessage = function(event) {
+            if(event.data === 'reload') {
+              window.location.reload();
+            }
+          };
+        });
+    </script>
+    <link href="
+https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.min.css
+" rel="stylesheet">
+    <script src="./scripts/main.js" type="module" defer></script>
+</head>
+<body>
+    <canvas id="threejs-canvas"></canvas>
+</body>
+</html>
