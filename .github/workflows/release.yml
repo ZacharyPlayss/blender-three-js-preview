@@ -1,0 +1,40 @@
+name: Build and Release Plugin
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch   # change to "minor" or "major" if needed
+
+      - name: Set up release folder
+        run: |
+          mkdir -p blenderThreePreviewer
+          cp -r webserver blenderThreePreviewer/
+          cp __init__.py blenderThreePreviewer/
+          cp webserver.py blenderThreePreviewer/
+
+      - name: Create ZIP archive
+        run: zip -r blenderThreePreviewer.zip blenderThreePreviewer
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          files: blenderThreePreviewer.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
