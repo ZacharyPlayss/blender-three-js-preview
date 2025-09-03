@@ -1,5 +1,3 @@
-from webserver import PreviewServer
-
 bl_info = {
     "name": "THREE.js GLTF previewer",
     "blender": (3, 0, 0),
@@ -10,7 +8,7 @@ bl_info = {
 import bpy
 import webbrowser
 import os
-
+from .webserver import PreviewServer
 
 server = None
 
@@ -27,12 +25,13 @@ class OPEN_THREEJS_PREVIEW_OT_operator(bpy.types.Operator):
     def execute(self, context):
         global server
         if not server:
-            server = PreviewServer(8080, web_folder, modelfolder)
+            server = PreviewServer(8080, web_folder)
             server.startServer()
         webbrowser.open("http://localhost:8080")
         return {'FINISHED'}
 
 class EXPORT_SCENE_OT_glb(bpy.types.Operator):
+    """Export Blender scene as GLB"""
     bl_idname = "wm.export_scene_glb"
     bl_label = "Export Scene as GLB"
 
@@ -48,6 +47,7 @@ class EXPORT_SCENE_OT_glb(bpy.types.Operator):
         return {'FINISHED'}
 
 class REFRESH_THREEJS_OT_operator(bpy.types.Operator):
+    """Open THREE.js Preview Again"""
     bl_idname = "wm.refresh_threejs_preview"
     bl_label = "Open THREE.js Preview Again"
 
@@ -57,6 +57,7 @@ class REFRESH_THREEJS_OT_operator(bpy.types.Operator):
         return {'FINISHED'}
 
 class THREEJS_PT_panel(bpy.types.Panel):
+    """Panel in 3D View sidebar"""
     bl_label = "THREE.js Preview"
     bl_idname = "VIEW3D_PT_threejs_preview"
     bl_space_type = 'VIEW_3D'

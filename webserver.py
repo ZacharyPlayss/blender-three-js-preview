@@ -1,15 +1,11 @@
 import http.server
 import socketserver
 import threading
-import time
-
-clients = []
 
 class PreviewServer:
-    def __init__(self, port, folder, modelfolder):
+    def __init__(self, port, folder):
         self.port = port
         self.folder = folder
-        self.modelFolder = modelfolder
         self.httpd = None
         self.thread = None
 
@@ -18,7 +14,7 @@ class PreviewServer:
             print("Server already running")
             return
 
-        handler = lambda *args, **kwargs: ReloadHandler(*args, directory=self.folder, **kwargs)
+        handler = lambda *args, **kwargs: http.server.SimpleHTTPRequestHandler(*args, directory=self.folder, **kwargs)
         self.httpd = socketserver.TCPServer(("", self.port), handler)
 
         def serve():
@@ -37,12 +33,3 @@ class PreviewServer:
             self.thread = None
         else:
             print("Server is not running")
-
-    def trigger_reload(self):
-        global clients
-        for client in clients[:]:
-            try:
-                client.write(b"data: reload\n\n")
-                client.flush()
-            except:
-                clients.remove(client)
