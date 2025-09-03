@@ -2,27 +2,8 @@ import http.server
 import socketserver
 import threading
 import time
-import os
 
 clients = []
-
-class ReloadHandler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/reload':
-            self.send_response(200)
-            self.send_header('Content-type', 'text/event-stream')
-            self.send_header('Cache-Control', 'no-cache')
-            self.end_headers()
-            clients.append(self.wfile)
-            try:
-                while True:
-                    time.sleep(1)  # keep connection alive
-            except:
-                if self.wfile in clients:
-                    clients.remove(self.wfile)
-        else:
-            super().do_GET()
-
 
 class PreviewServer:
     def __init__(self, port, folder, modelfolder):

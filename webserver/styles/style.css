@@ -9,3 +9,11 @@ body {
     height: 100%;
     display: block;
 }
+h2{
+    font-size:1.5rem;
+    top:0;
+    left:0;
+    width:100%;
+    text-align:center;
+    position:absolute;
+}
