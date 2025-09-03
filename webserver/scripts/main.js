@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import GUI from 'lil-gui';
-import { createPositionSliders, createRotationSliders, createScaleSliders, createAllTransformSliders } from 'lil-gui-helper';
+import { createPositionSliders, createRotationSliders, createScaleSliders, createAllTransformSliders,saveGuiState } from 'lil-gui-helper';
 
 const gui = new GUI();
 
@@ -83,7 +83,14 @@ const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -1;
 floor.receiveShadow = true;
-scene.add(floor);
+//scene.add(floor);
+
+//GROUND GRID PLANE
+const gridHelper = new THREE.GridHelper(20,20);
+scene.add(gridHelper);
+
+const guiGridFolder = gui.addFolder("Ground grid")
+guiGridFolder.add(gridHelper, 'visible').onChange(() => saveGuiState(gui));
 
 
 // DRACO LOADER CONFIG
@@ -95,6 +102,13 @@ let monkey1 = await loadModel('../assets/models/model.glb');
 monkey1.position.y = 0.5; // Place above floor
 scene.add(monkey1);
 createPositionSliders(gui, monkey1, -5, 5);
+
+//RESET THE GUI VALUES FROM LOCALSTORAGE
+const savedGuiState = localStorage.getItem("lilGuiState");
+
+if(savedGuiState !== null){
+    gui.load(JSON.parse(savedGuiState))
+}
 
 // CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
