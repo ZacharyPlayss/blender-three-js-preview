@@ -38,8 +38,10 @@ Clicking the server start should open up a browser window showing a monkey mesh 
 As of now manual refreshing of the browser window remains nessesary for changes to take affect.
 
 ### Why are the materials not displaying correctly in the previewer?
+
 Blender and three.js have their own ways of utilizing material configuration. If you need any help with how certain materials are mapped between blender and three.js
 You can use this handy [cheatsheet](https://cdn.pixel-capture.com/assets/images/blender_to_threejs_cheatsheet.png) created by [Valentin's coding book](https://www.youtube.com/@ValentinCoding).
+
 ---
 
 ## Contributing
