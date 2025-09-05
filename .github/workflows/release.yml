@@ -21,7 +21,11 @@ jobs:
       - name: Get version from manifest
         id: get_version
         run: |
-          VERSION=$(grep '^version' blender_manifest.toml | sed -E 's/version = "(.*)"/\1/')
+          VERSION=$(grep '^version' blender_manifest.toml | sed -E 's/^version = "(.*)"/\1/')
+          if [ -z "$VERSION" ]; then
+            echo "Error: Could not extract version from blender_manifest.toml"
+            exit 1
+          fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Detected version: $VERSION"
 
