@@ -1,10 +1,3 @@
-bl_info = {
-    "name": "THREE.js GLTF previewer",
-    "blender": (3, 0, 0),
-    "category": "3D View",
-    "description": "Preview blender models in three.js for a smoother exporting experience.",
-}
-
 import bpy
 import webbrowser
 import os
