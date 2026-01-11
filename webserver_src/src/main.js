@@ -1,53 +1,57 @@
+import './style.css';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
-import { createPositionSliders, createRotationSliders, createScaleSliders, createAllTransformSliders,saveGuiState } from 'lil-gui-helper';
+import {createPositionSliders} from "./lil-gui-helper.js";
 
 const gui = new GUI();
 
 // FUNCTIONS
 function handleWindowResize() {
-    const { clientWidth, clientHeight } = canvas;
-    camera.aspect = clientWidth / clientHeight;
+    camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(clientWidth, clientHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
 
 function configureDracoLoader(gltfLoader) {
     if (!(gltfLoader instanceof GLTFLoader)) {
-        throw new Error('The first parameter must be an instance of THREE.GLTFLoader');
+        throw new Error('The first parameter must be an instance of GLTFLoader');
     }
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/libs/draco/');
+    dracoLoader.setDecoderPath('/draco/');
+    dracoLoader.setDecoderConfig({ type: 'wasm' });
+
     gltfLoader.setDRACOLoader(dracoLoader);
 }
 
 function loadModel(url) {
-    let name = url.substring(url.lastIndexOf('/') + 1);
-    name = name.substring(0, name.lastIndexOf('.'));
-    console.log(name);
-    return new Promise((resolve, reject) => {
-        loader.load(
-            url,
-            (gltf) => {
-                gltf.scene.name = name;
-                resolve(gltf.scene);
-            },
-            (xhr) => {
-                console.log(Math.round(xhr.loaded / xhr.total * 100) + '% loaded');
-            },
-            (error) => {
-                console.error('Error loading model:', error);
-                reject(error);
-            }
-        );
-    });
+  let name = url.substring(url.lastIndexOf('/') + 1);
+  name = name.substring(0, name.lastIndexOf('.'));
+  console.log(name);
+  return new Promise((resolve, reject) => {
+    loader.load(
+      url,
+      (gltf) => {
+        gltf.scene.name = name;
+        resolve(gltf.scene);
+      },
+      (xhr) => {
+        console.log(Math.round(xhr.loaded / xhr.total * 100) + '% loaded');
+      },
+      (error) => {
+        console.error('Error loading model:', error);
+        reject(error);
+      }
+    );
+  });
 }
 
 // SCENE SETUP
 const canvas = document.querySelector('#threejs-canvas');
+console.log("canvas", canvas);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff); // Set background to white
 
@@ -57,7 +61,8 @@ camera.position.set(5, 5, 5);
 
 // RENDERER
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
 keyLight.position.set(5, 10, 5);
@@ -86,7 +91,7 @@ floor.receiveShadow = true;
 //scene.add(floor);
 
 //GROUND GRID PLANE
-const gridHelper = new THREE.GridHelper(20,20);
+const gridHelper = new THREE.GridHelper(20, 20);
 scene.add(gridHelper);
 
 const guiGridFolder = gui.addFolder("Ground grid")
@@ -98,7 +103,7 @@ const loader = new GLTFLoader();
 configureDracoLoader(loader);
 
 // LOAD CUSTOM MODEL
-let monkey1 = await loadModel('../assets/models/model.glb');
+let monkey1 = await loadModel('/assets/models/model.glb');
 monkey1.position.y = 0.5; // Place above floor
 scene.add(monkey1);
 createPositionSliders(gui, monkey1, -5, 5);
@@ -106,8 +111,8 @@ createPositionSliders(gui, monkey1, -5, 5);
 //RESET THE GUI VALUES FROM LOCALSTORAGE
 const savedGuiState = localStorage.getItem("lilGuiState");
 
-if(savedGuiState !== null){
-    gui.load(JSON.parse(savedGuiState))
+if (savedGuiState !== null) {
+  gui.load(JSON.parse(savedGuiState))
 }
 
 // CONTROLS
@@ -117,9 +122,9 @@ controls.update();
 
 // ANIMATE
 function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
-    controls.update();
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+  controls.update();
 }
 handleWindowResize();
 animate();

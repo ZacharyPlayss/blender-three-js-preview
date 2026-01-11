@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id="threejs_gltf_previewer"
-version="1.0.0"
+version="1.0.1"
 name="THREE.js GLTF Previewer"
 tagline= "Preview blender scenes in THREE.js"
 maintainer = "Zachary Van De Staey <zacharyplays2.0@gmail.com>"

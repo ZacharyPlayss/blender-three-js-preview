@@ -1,6 +1,9 @@
 import http.server
 import socketserver
-import threading
+import subprocess
+import sys
+import textwrap
+
 
 class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -9,33 +12,57 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Expires", "0")
         super().end_headers()
 
+
 class PreviewServer:
     def __init__(self, port, folder):
         self.port = port
         self.folder = folder
-        self.httpd = None
-        self.thread = None
+        self.proc = None
 
     def startServer(self):
-        if self.thread and self.thread.is_alive():
+        # If already running, do nothing
+        if self.proc and self.proc.poll() is None:
             print("Server already running")
             return
-        handler = lambda *args, **kwargs: NoCacheHandler(*args, directory=self.folder, **kwargs)
-        self.httpd = socketserver.TCPServer(("", self.port), handler)
 
-        def serve():
-            print(f"Serving {self.folder} at http://localhost:{self.port}")
-            self.httpd.serve_forever()
+        child_code = textwrap.dedent(f"""
+            import http.server
+            import socketserver
 
-        self.thread = threading.Thread(target=serve, daemon=True)
-        self.thread.start()
+            class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
+                def end_headers(self):
+                    self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+                    self.send_header("Pragma", "no-cache")
+                    self.send_header("Expires", "0")
+                    super().end_headers()
+
+            port = {self.port}
+            folder = {self.folder!r}
+
+            Handler = lambda *args, **kwargs: NoCacheHandler(*args, directory=folder, **kwargs)
+
+            class ReuseTCPServer(socketserver.TCPServer):
+                allow_reuse_address = True
+
+            with ReuseTCPServer(("", port), Handler) as httpd:
+                print(f"Serving {{folder}} at http://localhost:{{port}}", flush=True)
+                httpd.serve_forever()
+        """)
+
+        self.proc = subprocess.Popen([sys.executable, "-c", child_code])
 
     def stopServer(self):
-        if self.httpd:
-            print("Stopping server...")
-            self.httpd.shutdown()
-            self.httpd.server_close()
-            self.httpd = None
-            self.thread = None
-        else:
+        if not self.proc or self.proc.poll() is not None:
             print("Server is not running")
+            self.proc = None
+            return
+
+        print("Stopping server...")
+        self.proc.terminate()
+        try:
+            self.proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            self.proc.kill()
+            self.proc.wait()
+
+        self.proc = None
