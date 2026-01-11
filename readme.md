@@ -15,8 +15,8 @@ This helps speed up iteration times when building web-based 3D experiences with 
 
 ## Tested Versions
 This add-on has been tested with the following versions:
-- **Blender**: 4.5
-- **Three.js**: r172
+- **Blender**: 5.0.1
+- **Three.js**: r182
   (Other versions may also work, but these are the once used while developing the add-on)
 ---
 
