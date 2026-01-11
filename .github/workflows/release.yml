@@ -2,11 +2,9 @@ name: Build and Release Plugin
 
 on:
   push:
-    branches:
-      - main
 
 permissions:
-  contents: write  
+  contents: write
 
 jobs:
   build-and-release:
@@ -16,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  
+          fetch-depth: 0
 
       - name: Get version from manifest
         id: get_version
@@ -29,10 +27,24 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Detected version: $VERSION"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Build Webserver
+        run: |
+          cd webserver_src
+          npm install
+          npm run build
+          # This creates the 'webserver' folder at the root as per your requirement
+
       - name: Set up release folder
         run: |
           mkdir -p blenderThreePreview
-          cp -r webserver blenderThreePreview/
+          # Copy the build output folder
+          cp -r webserver/ blenderThreePreview/
+          # Copy root files (as shown in your first image)
           cp __init__.py blenderThreePreview/
           cp webserver.py blenderThreePreview/
           cp blender_manifest.toml blenderThreePreview/
