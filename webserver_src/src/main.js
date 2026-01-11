@@ -10,10 +10,10 @@ const gui = new GUI();
 
 // FUNCTIONS
 function handleWindowResize() {
-  const { clientWidth, clientHeight } = canvas;
-  camera.aspect = clientWidth / clientHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(clientWidth, clientHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
 
 function configureDracoLoader(gltfLoader) {
@@ -61,7 +61,8 @@ camera.position.set(5, 5, 5);
 
 // RENDERER
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
 keyLight.position.set(5, 10, 5);
