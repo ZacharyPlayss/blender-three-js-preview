@@ -4,8 +4,3 @@
 
 # 25/09/2025
 - Initial plugin configuration
-
-
-/*
-Using Blender logo in extension images isn't allowed, please remove it from the thumbnail.
-*/
