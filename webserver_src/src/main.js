@@ -1,9 +1,10 @@
+import './style.css';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
-import { createPositionSliders, saveGuiState } from 'lil-gui-helper';
+import {createPositionSliders} from "./lil-gui-helper.js";
 
 const gui = new GUI();
 
@@ -16,12 +17,14 @@ function handleWindowResize() {
 }
 
 function configureDracoLoader(gltfLoader) {
-  if (!(gltfLoader instanceof GLTFLoader)) {
-    throw new Error('The first parameter must be an instance of THREE.GLTFLoader');
-  }
-  const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/libs/draco/');
-  gltfLoader.setDRACOLoader(dracoLoader);
+    if (!(gltfLoader instanceof GLTFLoader)) {
+        throw new Error('The first parameter must be an instance of GLTFLoader');
+    }
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('/draco/');
+    dracoLoader.setDecoderConfig({ type: 'wasm' });
+
+    gltfLoader.setDRACOLoader(dracoLoader);
 }
 
 function loadModel(url) {
@@ -48,6 +51,7 @@ function loadModel(url) {
 
 // SCENE SETUP
 const canvas = document.querySelector('#threejs-canvas');
+console.log("canvas", canvas);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff); // Set background to white
 
@@ -98,7 +102,7 @@ const loader = new GLTFLoader();
 configureDracoLoader(loader);
 
 // LOAD CUSTOM MODEL
-let monkey1 = await loadModel('../assets/models/model.glb');
+let monkey1 = await loadModel('/assets/models/model.glb');
 monkey1.position.y = 0.5; // Place above floor
 scene.add(monkey1);
 createPositionSliders(gui, monkey1, -5, 5);
